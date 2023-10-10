@@ -36,6 +36,7 @@ jobs:
 
   deploy:
     needs: build
+    runs-on: ubuntu-latest
     steps:
     - name: Deploy on ec2 instance
       run: echo "it is ready for the deployment"
