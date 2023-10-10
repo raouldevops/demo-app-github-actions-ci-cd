@@ -28,7 +28,7 @@ jobs:
     - name: Build and test with Maven
       run: mvn clean install
     - name: SonarQube Scan
-      run: mvn sonar:sonar -s .\.m2\settings.xml -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      run: mvn sonar:sonar -s .m2/settings.xml -Dsonar.login=${{ secrets.SONAR_TOKEN }}
     - name: SonarQube Quality Gate check
       id: sonarqube-quality-gate-check
       uses: sonarsource/sonarqube-quality-gate-action@master
