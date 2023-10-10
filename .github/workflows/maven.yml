@@ -16,16 +16,26 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-    - name: Set up JDK 17
+    - name: Setup Java 17
       uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - name: Build with Maven
+    - name: Build and test with Maven
       run: mvn clean install
+    - name: Login to github
+      run: docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password ${{ secrets.DOCKERHUB_PASSWORD }}
+    - name: Build docker image
+      run: docker build -t raouldevops/demo-github-actions-app .
+    - name: Publish image to docker hub
+      run: docker push raouldevops/demo-github-actions-app:latest
+
+  deploy:
+    needs: build
+    steps:
+    - name: Deploy on ec2 instance
+      run: echo "it is ready for the deployment"
