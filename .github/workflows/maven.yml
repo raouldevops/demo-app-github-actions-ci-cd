@@ -28,9 +28,11 @@ jobs:
     - name: Build and test with Maven
       run: mvn clean install
     - name: SonarCloud Analysis
-      uses: sonarsource/sonarcloud-github-action@master
+      uses: sonarsource/sonarcloud-github-action@v1.8
       with:
-        projectBaseDir: .
+        args: >
+          -Dsonar.organization=raouldevops
+          -Dsonar.projectKey=raouldevops_demo-app-github-actions-ci-cd
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -38,7 +40,7 @@ jobs:
       id: sonarqube-quality-gate-check
       uses: sonarsource/sonarqube-quality-gate-action@master
       # Force to fail step after specific time.
-      timeout-minutes: 20
+      timeout-minutes: 5
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     - name: "SonarQube Quality Gate Status"
