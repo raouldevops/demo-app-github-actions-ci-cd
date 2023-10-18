@@ -28,25 +28,12 @@ jobs:
     - name: Build and test with Maven
       run: mvn clean install
     - name: SonarCloud Analysis
-#      uses: sonarsource/sonarcloud-github-action@v1.8
-#      with:
-#        args: >
-#          -Dsonar.organization=raouldevops
-#          -Dsonar.projectKey=raouldevops_demo-app-github-actions-ci-cd
-#      env:
-#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: mvn sonar:sonar -s .m2/settings.xml -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.organization=raouldevops -Dsonar.projectKey=raouldevops_demo-app-github-actions-ci-cd
     - name: SonarQube Quality Gate check
+      id: sonarqube-quality-gate-check
       run: mvn verify sonar:sonar -s .m2/settings.xml -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.organization=raouldevops -Dsonar.projectKey=raouldevops_demo-app-github-actions-ci-cd -Dsonar.qualitygate.wait=true
-#      id: sonarqube-quality-gate-check
-#      uses: sonarsource/sonarqube-quality-gate-action@master
-#      # Force to fail step after specific time.
-#      timeout-minutes: 5
-#      env:
-#        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     - name: SonarQube Quality Gate Status
-      run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+      run: echo "The Quality Gate status is ${{ sonarqube-quality-gate-check.outputs.quality-gate-status }}"
     - name: Login to docker
       run: docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password ${{ secrets.DOCKERHUB_PASSWORD }}
     - name: Build docker image
