@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Pipeline CI CD
+name: Pipeline dev
 
 on:
   push:
@@ -32,12 +32,8 @@ jobs:
     - name: SonarCloud Analysis
       run: mvn sonar:sonar -s .m2/settings.xml -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.organization=raouldevops -Dsonar.projectKey=raouldevops_demo-app-github-actions-ci-cd
 
-    - name: SonarQube Quality Gate check
-      id: sonarqube-quality-gate-check
-      run: mvn verify sonar:sonar -s .m2/settings.xml -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.organization=raouldevops -Dsonar.projectKey=raouldevops_demo-app-github-actions-ci-cd -Dsonar.qualitygate.wait=true
-
-    - name: SonarQube Quality Gate Status
-      run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+    - name: SonarCloud Quality Gate
+      run: mvn clean verify sonar:sonar -s .m2/settings.xml -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.organization=raouldevops -Dsonar.projectKey=raouldevops_demo-app-github-actions-ci-cd -Dsonar.qualitygate.wait=true
 
     - name: Login to docker
       run: docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -50,7 +46,11 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: [aws-ec2-dev]
     steps:
-    - name: Deploy on ec2 instance
-      run: echo "it is ready for the deployment"
+    - name: Pull image from docker hub
+      run: docker pull raouldevops/demo-github-actions-app:latest
+    - name: Pull image from docker hub
+      run: docker rm -f demo-github-actions-app
+    - name: Pull image from docker hub
+      run: docker run -d -p 80:80 --name api_backend raouldevops/demo-github-actions-app:latest
