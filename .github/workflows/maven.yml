@@ -25,19 +25,26 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+
     - name: Build and test with Maven
       run: mvn clean install
+
     - name: SonarCloud Analysis
       run: mvn sonar:sonar -s .m2/settings.xml -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.organization=raouldevops -Dsonar.projectKey=raouldevops_demo-app-github-actions-ci-cd
+
     - name: SonarQube Quality Gate check
       id: sonarqube-quality-gate-check
       run: mvn verify sonar:sonar -s .m2/settings.xml -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.organization=raouldevops -Dsonar.projectKey=raouldevops_demo-app-github-actions-ci-cd -Dsonar.qualitygate.wait=true
+
     - name: SonarQube Quality Gate Status
-      run: echo "The Quality Gate status is ${{ sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+      run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+
     - name: Login to docker
       run: docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password ${{ secrets.DOCKERHUB_PASSWORD }}
+
     - name: Build docker image
       run: docker build -t raouldevops/demo-github-actions-app .
+
     - name: Publish image to docker hub
       run: docker push raouldevops/demo-github-actions-app:latest
 
