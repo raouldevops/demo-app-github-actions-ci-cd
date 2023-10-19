@@ -29,9 +29,6 @@ jobs:
     - name: Build and test with Maven
       run: mvn clean install
 
-    - name: SonarCloud Analysis
-      run: mvn sonar:sonar -s .m2/settings.xml -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.organization=raouldevops -Dsonar.projectKey=raouldevops_demo-app-github-actions-ci-cd
-
     - name: SonarCloud Quality Gate
       run: mvn clean verify sonar:sonar -s .m2/settings.xml -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.organization=raouldevops -Dsonar.projectKey=raouldevops_demo-app-github-actions-ci-cd -Dsonar.qualitygate.wait=true
 
@@ -46,11 +43,13 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: [aws-ec2-dev]
+    runs-on: [server]
     steps:
     - name: Pull image from docker hub
       run: docker pull raouldevops/demo-github-actions-app:latest
+
     - name: Pull image from docker hub
       run: docker rm -f demo-github-actions-app
+
     - name: Pull image from docker hub
-      run: docker run -d -p 80:80 --name api_backend raouldevops/demo-github-actions-app:latest
+      run: docker run -d -p 8000:8000 --name api_backend raouldevops/demo-github-actions-app:latest
